@@ -1,37 +1,49 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QPixmap>
 #include <algorithm>
+#include <cmath>
+
+namespace
+{
+QColor getRandomColor(){
+    return QColor(
+                rand() % 255,
+                rand() % 255,
+                rand() % 255
+                );
+}
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
     srand(time(0));
+
     ui->setupUi(this);
-
     connect(&timer, &QTimer::timeout, this, &MainWindow::update_view);
-    connect(ui->speedSlider, &QSlider::valueChanged, this, &MainWindow::set_speed);
-
-    image = QImage(QSize(300, 300), QImage::Format_RGB888);
     timer.setInterval(0);
     timer.start();
 
-    for(auto i = 0; i < 10; i++)
-    {
+    image = QImage(QSize(300,300), QImage::Format_RGB888);
+
+    for(auto i = 0;i<10;i++){
         Metaball ball;
 
         ball.size = rand() % 10000 + 10000;
-        ball.position = QPointF
-        (
+        ball.position =
+        {
             rand() % 300,
             rand() % 300
-        );
-        ball.velocity = QPointF
-        (
+        };
+        ball.velocity =
+        {
             rand() % 10 - 5,
             rand() % 10 - 5
-        );
+        };
 
         balls.push_back(ball);
     }
@@ -44,37 +56,26 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_view()
 {
-    auto begin = std::chrono::system_clock::now();
-    for (auto x = 0; x < image.width(); x++)
-    {
-        for (auto y = 0; y < image.height(); y++)
-        {
+
+    for(auto i = 0;i < image.width();i++){
+        for(auto j = 0;j<image.height();j++){
             float value = 0;
+            for(auto& ball : balls){
+                auto dx = ball.position.x() - i;
+                auto dy = ball.position.y() - j;
 
-            for(auto& ball: balls)
-            {
-                auto dx = ball.position.x() - x;
-                auto dy = ball.position.y() - y;
-                auto dd = std::sqrt(dx * dx + dy * dy);
-
-                value += ball.size / dd;
+                auto d = std::sqrt(dx * dx + dy * dy);
+                value += ball.size / d;
             }
+            std::size_t _val = value;
 
-            std::size_t val = value;
-            image.setPixelColor(x, y, QColor::fromHsl(val% 128 + 128, val%128 + 128, val%64));
+            image.setPixelColor(i,j,QColor(_val % 255, _val % 255, _val % 255));
         }
     }
 
-    for (auto& ball: balls)
-        ball.update(image.size(), speed * dt);
+    for(auto& ball : balls)
+        ball.update(image.size());
 
-    ui->label->setPixmap(QPixmap::fromImage(image));
-    auto end = std::chrono::system_clock::now();
-    dt = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() / 1000.0f;
-}
-
-void MainWindow::set_speed(int value)
-{
-    speed = value / 100.0f;
+    ui->view->setPixmap(QPixmap::fromImage(image));
 }
 

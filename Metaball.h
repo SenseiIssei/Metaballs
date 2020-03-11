@@ -3,24 +3,26 @@
 
 #include <utility>
 #include <QPoint>
-#include <QPointF>
 #include <QSize>
 
 struct Metaball
 {
-    QPointF position, velocity;
-    std::size_t size;
+  std::size_t size = 0;
 
-    inline void update(QSize size, float speed)
-    {
-        position += velocity * speed;
+  QPoint
+  position = {0,0},
+  velocity = {0,0};
 
-        if (position.x() < 0) { position.setX(0); velocity.setX(velocity.x() * -1); }
-        if (position.y() < 0) { position.setY(0); velocity.setY(velocity.y() * -1); }
+  inline void update(QSize border)
+  {
+      position += velocity;
 
-        if (position.x() >= size.width()) { position.setX(size.width() - 1); velocity.setX(velocity.x() * -1); }
-        if (position.y() >= size.height()) { position.setY(size.height() - 1); velocity.setY(velocity.y() * -1); }
-    }
+      if(position.x() < 0) { position.setX(0); velocity.setX(velocity.x() * -1); }
+      if(position.y() < 0) { position.setY(0); velocity.setY(velocity.y() * -1); }
+
+      if(position.x() >= border.width()) { position.setX(border.width() - 1); velocity.setX(velocity.x() * -1); }
+      if(position.y() >= border.width()) { position.setY(border.width() - 1); velocity.setY(velocity.y() * -1); }
+  }
 };
 
 #endif // METABALL_H

@@ -1,7 +1,8 @@
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+TARGET = MetaBaelle
+TEMPLATE = app
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -20,8 +21,8 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
-    Metaball.h \
-    mainwindow.h
+    mainwindow.h \
+    metaball.h
 
 FORMS += \
     mainwindow.ui
